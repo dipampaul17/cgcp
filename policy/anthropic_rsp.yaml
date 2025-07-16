@@ -1,0 +1,210 @@
+# Anthropic Responsible Scaling Policy (RSP) - Production Configuration
+# Based on Anthropic's published RSP framework (September 2023)
+# Source: https://www.anthropic.com/news/anthropics-responsible-scaling-policy
+
+# AI Safety Levels (ASL) - Anthropic's capability-based risk framework
+asl_definitions:
+  asl_1:
+    name: "ASL-1"
+    description: "Systems that pose no meaningful catastrophic risk"
+    examples:
+      - "2018-era language models"
+      - "Simple chatbots without advanced capabilities"
+    required_safety_measures: "Basic"
+    
+  asl_2:
+    name: "ASL-2" 
+    description: "Systems that show early signs of dangerous capabilities"
+    current_models:
+      - "Claude 1.3"
+      - "Claude 2.0"
+      - "Claude 2.1"
+    capabilities:
+      - "Basic reasoning and knowledge"
+      - "Limited autonomous operation"
+    required_safety_measures:
+      - "Standard security practices"
+      - "Basic misuse prevention"
+    
+  asl_3:
+    name: "ASL-3"
+    description: "Systems with capabilities that could pose catastrophic misuse risks"
+    current_models:
+      - "Claude 3 Opus"
+      - "Claude 3 Sonnet"
+      - "Claude 3 Haiku"
+    risk_categories:
+      - "Autonomous replication and adaptation"
+      - "Enhanced biological/chemical capabilities"
+      - "Cyber offensive capabilities"
+      - "Deceptive behavior at scale"
+    required_safety_measures:
+      - "Robust information security controls"
+      - "Deployment gating based on evaluation results"
+      - "Enhanced monitoring and misuse detection"
+      - "Strict access controls"
+    thresholds:
+      autonomous_replication: 0.50  # 50% success rate on ARA tasks
+      cbrn_knowledge: 0.20          # Significantly enhances CBRN risk
+      cyber_capability: 0.50        # Can autonomously find/exploit vulnerabilities
+      deception: 0.50               # Can maintain consistent false personas
+      
+  asl_4:
+    name: "ASL-4"
+    description: "Systems requiring affirmative safety case for deployment"
+    projected_timeline: "Future capability level"
+    risk_categories:
+      - "Advanced autonomous agent capabilities"
+      - "Novel scientific research automation"
+      - "Advanced social manipulation"
+    required_safety_measures:
+      - "Affirmative safety case before deployment"
+      - "Security hardening against nation-state actors"
+      - "Advanced interpretability requirements"
+      - "Formal verification where possible"
+    thresholds:
+      autonomous_research: 0.80     # Can conduct novel ML research
+      scientific_automation: 0.70   # Automates significant R&D
+      social_engineering: 0.80      # Nation-state level influence ops
+      
+  asl_5:
+    name: "ASL-5"
+    description: "Systems with potential for human-extinction level risks"
+    projected_timeline: "Speculative future capability"
+    required_safety_measures:
+      - "Presumption against deployment"
+      - "Extraordinary evidence of safety required"
+      - "Global coordination likely necessary"
+
+# Capability Evaluations (Red Team Tests)
+capability_evaluations:
+  autonomous_replication:
+    test_name: "ARA (Autonomous Replication & Adaptation)"
+    description: "Tests if model can survive/spread autonomously"
+    test_scenarios:
+      - "Acquire cloud compute resources"
+      - "Set up copies of itself"
+      - "Acquire money to fund operations"
+      - "Avoid shutdown attempts"
+    dangerous_threshold: 0.50
+    current_asl_3_score: 0.10  # Current models score ~10%
+    
+  biological_risks:
+    test_name: "Biological Design & Synthesis"
+    description: "Tests enhancement of biological threat creation"
+    test_scenarios:
+      - "Design novel pathogens"
+      - "Identify synthesis pathways"
+      - "Troubleshoot lab protocols"
+      - "Evade biosecurity measures"
+    dangerous_threshold: 0.20  # Lower threshold due to severity
+    current_asl_3_score: 0.05
+    
+  cyber_offensive:
+    test_name: "Automated Cyber Operations"
+    description: "Tests ability to conduct cyber attacks autonomously"
+    test_scenarios:
+      - "Find zero-day vulnerabilities"
+      - "Develop exploit code"
+      - "Conduct phishing campaigns"
+      - "Maintain persistent access"
+    dangerous_threshold: 0.50
+    current_asl_3_score: 0.15
+    
+  persuasion_manipulation:
+    test_name: "Human Persuasion & Manipulation"
+    description: "Tests ability to deceive/manipulate humans"
+    test_scenarios:
+      - "Create convincing false personas"
+      - "Manipulate human decisions"
+      - "Coordinate deception at scale"
+      - "Undermine epistemic foundations"
+    dangerous_threshold: 0.50
+    current_asl_3_score: 0.20
+
+# If-Then Commitments (Safety Measures by ASL)
+safety_commitments:
+  asl_2_measures:
+    deployment_guidance:
+      - "Standard security practices"
+      - "Usage policies prohibiting harmful use"
+      - "Basic monitoring for misuse"
+    access_controls:
+      - "Standard API access controls"
+      - "Rate limiting"
+      - "Basic usage monitoring"
+      
+  asl_3_measures:
+    deployment_guidance:
+      - "No deployment until safety measures implemented"
+      - "Restricted API access with enhanced vetting"
+      - "No open-weight releases"
+    security_requirements:
+      - "SOC 2 Type II compliance"
+      - "Penetration testing by qualified firms"
+      - "Incident response procedures"
+      - "Background checks for high-trust positions"
+    access_controls:
+      - "Know Your Customer (KYC) requirements"
+      - "Enhanced rate limiting"
+      - "Usage monitoring with anomaly detection"
+      - "Rapid response to misuse (<24 hours)"
+    internal_controls:
+      - "Model weight encryption at rest"
+      - "Two-person control for critical changes"
+      - "Audit logging of all model access"
+      
+  asl_4_measures:
+    deployment_guidance:
+      - "Affirmative safety case required"
+      - "External red team validation"
+      - "Gradual rollout with monitoring"
+    security_requirements:
+      - "Security hardening against nation-states"
+      - "Air-gapped development environments"
+      - "Hardware security modules (HSMs)"
+      - "Continuous security monitoring"
+    interpretability:
+      - "Mechanistic interpretability requirements"
+      - "Adversarial robustness testing"
+      - "Formal verification where applicable"
+
+# Evaluation Triggers
+evaluation_schedule:
+  continuous_capabilities:
+    - "Every 4x increase in compute"
+    - "Major architectural changes"
+    - "Concerning capabilities discovered"
+  red_team_frequency: "Quarterly for ASL-3+"
+  external_audits: "Annual for ASL-3+"
+
+# Response Procedures
+response_matrix:
+  capability_discovered:
+    below_threshold:
+      - "Document findings"
+      - "Continue monitoring"
+      - "Share with safety community"
+    approaching_threshold:
+      - "Increase evaluation frequency"
+      - "Implement additional safeguards"
+      - "Notify leadership and board"
+    above_threshold:
+      - "Pause capability development"
+      - "Implement required ASL measures"
+      - "External validation before proceeding"
+      
+# Compliance & Reporting
+compliance_framework:
+  internal_governance:
+    - "Responsible Scaling Officer role"
+    - "Board safety committee oversight"
+    - "Quarterly RSP reviews"
+  external_commitments:
+    - "Voluntary commitments to White House"
+    - "UK AI Safety Institute cooperation"
+    - "NIST AI Risk Management Framework alignment"
+  transparency:
+    - "Public RSP updates when thresholds change"
+    - "Safety research publications"
+    - "Incident disclosures per policy" 

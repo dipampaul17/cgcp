@@ -1,0 +1,223 @@
+# Claude Governance Control Plane - Policy Configuration
+# Based on Anthropic's Responsible Scaling Policy (RSP)
+# Reference: https://www.anthropic.com/news/anthropics-responsible-scaling-policy
+
+# Risk thresholds by category and tier - Based on actual ASL-3 thresholds
+risk_thresholds:
+  cbrn: 
+    general: 0.15        # Below ASL-3 biological threshold (0.20)
+    enterprise: 0.18     # Still below threshold but monitored
+    research_sandbox: 0.25  # Allows research above threshold with controls
+  
+  self_harm:
+    general: 0.30        # Conservative for public safety
+    enterprise: 0.50     # Balanced with support systems
+    research_sandbox: 0.80  # High threshold for research
+  
+  jailbreak:
+    general: 0.30        # Low tolerance for bypass attempts
+    enterprise: 0.45     # Below deception threshold (0.50)
+    research_sandbox: 0.60   # Above threshold for testing
+  
+  exploitation:
+    general: 0.30        # Well below cyber threshold (0.50)
+    enterprise: 0.45     # Approaching cyber threshold
+    research_sandbox: 0.60  # Above threshold for red teams
+
+# ASL (AI Safety Level) triggers - From actual RSP
+asl_triggers:
+  asl_3:  # Current Claude models
+    triggers:
+      # Biological/Chemical risks - Lower threshold due to severity
+      - category: cbrn
+        confidence: 0.20
+        description: "Significantly enhances biological/chemical threat creation"
+        
+      # Autonomous replication capability
+      - category: autonomous_replication
+        confidence: 0.50
+        description: "50% success rate on ARA (Autonomous Replication & Adaptation) tasks"
+        
+      # Cyber offensive capability
+      - category: cyber_offense
+        confidence: 0.50
+        description: "Can autonomously find and exploit vulnerabilities"
+        
+      # Deception/manipulation capability
+      - category: deception
+        confidence: 0.50
+        description: "Can maintain consistent false personas or manipulate at scale"
+    
+  asl_4:  # Future capability threshold
+    triggers:
+      # Advanced autonomous research
+      - category: autonomous_research
+        confidence: 0.80
+        description: "Can conduct novel ML research autonomously"
+        
+      # Scientific automation
+      - category: scientific_automation
+        confidence: 0.70
+        description: "Automates significant R&D processes"
+        
+      # Nation-state level manipulation
+      - category: social_engineering
+        confidence: 0.80
+        description: "Nation-state level influence operations"
+
+# Enforcement actions aligned with RSP commitments
+actions:
+  allow:
+    message: "Request processed successfully"
+    log_level: "info"
+  
+  block:
+    message: "Content blocked per Anthropic Responsible Scaling Policy. This request exceeds safety thresholds for your access tier."
+    log_level: "warning"
+    notify_safety_team: false
+  
+  redact:
+    pattern: "[CONTENT REDACTED FOR SAFETY]"
+    message: "Sensitive content has been redacted per RSP guidelines"
+    log_level: "warning"
+    
+  escalate:
+    queue: "safety_review"
+    message: "Your request requires safety review per ASL-3 requirements. Our team will assess within 24 hours."
+    log_level: "error"
+    notify_safety_team: true
+    sla_hours: 24  # RSP commitment for rapid response
+
+# Tier definitions with RSP-aligned controls
+tiers:
+  general:
+    description: "Public access through claude.ai - ASL-3 public deployment"
+    rsp_requirements:
+      - "No access to capabilities above thresholds"
+      - "Conservative safety margins"
+      - "Automated blocking of risky content"
+    capabilities:
+      - basic_assistance
+      - creative_writing
+      - code_help
+      - general_knowledge
+    restrictions:
+      - no_advanced_chemistry
+      - no_bioengineering
+      - no_exploit_generation
+      - no_autonomous_operation
+    rate_limits:
+      requests_per_hour: 100
+      tokens_per_day: 50000
+  
+  enterprise:
+    description: "Verified organizations with KYC - ASL-3 restricted API"
+    rsp_requirements:
+      - "Know Your Customer (KYC) verification"
+      - "Usage monitoring with anomaly detection"
+      - "24-hour misuse response SLA"
+      - "Contractual safety commitments"
+    capabilities:
+      - advanced_analysis
+      - bulk_processing
+      - custom_models
+      - api_access
+    restrictions:
+      - monitored_sensitive_topics
+      - audit_trail_required
+      - no_open_weights_access
+    rate_limits:
+      requests_per_hour: 1000
+      tokens_per_day: 1000000
+  
+  research_sandbox:
+    description: "Approved safety researchers - ASL-3 red team access"
+    rsp_requirements:
+      - "Background checks required"
+      - "Signed safety research agreement"
+      - "Isolated environment"
+      - "All interactions logged and reviewed"
+      - "Quarterly capability evaluations"
+    capabilities:
+      - adversarial_testing
+      - safety_research
+      - model_evaluation
+      - jailbreak_research
+      - threshold_testing
+    restrictions:
+      - isolated_environment
+      - mandatory_comprehensive_logging
+      - research_agreement_required
+      - external_audit_participation
+    rate_limits:
+      requests_per_hour: 500
+      tokens_per_day: 500000
+
+# Monitoring and alerting per RSP
+monitoring:
+  high_risk_threshold: 0.15  # Alert on approaching ASL thresholds
+  asl_escalation_alert: true
+  metrics_retention_days: 90
+  capability_evaluation_frequency: "quarterly"
+  
+  alert_channels:
+    - type: email
+      recipients: ["safety@anthropic.com"]
+      severity: ["critical", "high"]
+    - type: slack
+      webhook: "${SLACK_SAFETY_WEBHOOK}"
+      severity: ["critical", "high", "medium"]
+    - type: pagerduty
+      api_key: "${PAGERDUTY_API_KEY}"
+      severity: ["critical"]  # ASL threshold breaches
+
+# Compliance mapping
+compliance:
+  frameworks:
+    - name: "ISO 42001"
+      version: "2023"
+      applicable: true
+      requirements:
+        - "AI risk assessment"
+        - "Access controls"
+        - "Monitoring and measurement"
+        - "Incident response"
+    - name: "NIST AI RMF"
+      version: "1.0"
+      applicable: true
+      requirements:
+        - "Map AI risks"
+        - "Measure performance"
+        - "Manage AI risks"
+        - "Govern AI systems"
+    - name: "EU AI Act"
+      version: "2024"
+      applicable: true
+      risk_level: "High-risk AI system"
+    - name: "White House Commitments"
+      version: "July 2023"
+      applicable: true
+      commitments:
+        - "Red team testing"
+        - "Information sharing"
+        - "Safety research investment"
+
+# Safety evaluation schedule per RSP
+evaluation_schedule:
+  capability_tests:
+    - name: "ARA (Autonomous Replication)"
+      frequency: "quarterly"
+      current_score: 0.10
+      threshold: 0.50
+    - name: "Biological Design"
+      frequency: "quarterly"
+      current_score: 0.05
+      threshold: 0.20
+    - name: "Cyber Offensive"
+      frequency: "quarterly"
+      current_score: 0.15
+      threshold: 0.50
+    - name: "Deception/Manipulation"
+      frequency: "quarterly"
+      current_score: 0.20
+      threshold: 0.50 

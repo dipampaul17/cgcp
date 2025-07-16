@@ -1,0 +1,145 @@
+# ISO 42001:2023 Control Mapping for AI Governance
+# Maps Anthropic's safeguards to ISO control requirements
+
+anthropic_safeguards:
+  # Access Control Family
+  access_control:
+    iso_clause: "9.2.1"
+    control_name: "User access management"
+    control_description: "Access to AI systems shall be restricted based on business and security requirements"
+    evidence: "tier-based policy enforcement"
+    implementation:
+      - "Three-tier access model (General, Enterprise, Research Sandbox)"
+      - "Rate limiting per tier"
+      - "Automated access control based on organization verification"
+    
+  identity_verification:
+    iso_clause: "9.2.2"
+    control_name: "User registration and de-registration"
+    control_description: "Formal user registration and de-registration process for granting access"
+    evidence: "user and org tracking"
+    implementation:
+      - "Unique user_id and org_id assignment"
+      - "Event-level tracking of all interactions"
+  
+  # Risk Assessment Family
+  real_time_classifier:
+    iso_clause: "8.2.3"
+    control_name: "Technical risk assessment"
+    control_description: "AI risks shall be identified, analyzed and evaluated on a continuous basis"
+    evidence: "risk detection metrics"
+    implementation:
+      - "Four risk categories: CBRN, Self-harm, Jailbreak, Exploitation"
+      - "Real-time scoring with confidence levels"
+      - "Pattern matching with weighted algorithms"
+    
+  threat_intelligence:
+    iso_clause: "8.2.4"
+    control_name: "AI risk assessment"
+    control_description: "Specific AI-related risks including bias, security, and safety"
+    evidence: "ASL trigger monitoring"
+    implementation:
+      - "ASL-3 and ASL-4 capability thresholds"
+      - "Automated escalation for high-risk scenarios"
+  
+  # Monitoring Family
+  async_monitoring:
+    iso_clause: "9.4.1"
+    control_name: "Information monitoring"
+    control_description: "AI system behavior and outputs shall be monitored"
+    evidence: "review queue processing times"
+    implementation:
+      - "Human-in-the-loop review queue"
+      - "24/7 event stream monitoring"
+      - "Hourly aggregation and alerting"
+    
+  audit_logging:
+    iso_clause: "9.4.2"
+    control_name: "Logging and monitoring"
+    control_description: "Logs recording AI system activities shall be produced and reviewed"
+    evidence: "comprehensive event logging"
+    implementation:
+      - "All events stored with full context"
+      - "Policy decisions logged with reasoning"
+      - "90-day retention policy"
+  
+  # Incident Response Family
+  incident_detection:
+    iso_clause: "10.1.1"
+    control_name: "Incident response planning"
+    control_description: "Detection and response to AI system incidents"
+    evidence: "escalation workflow"
+    implementation:
+      - "Automated detection of policy violations"
+      - "Tiered response (block, redact, escalate)"
+      - "SLA-based review queue"
+    
+  incident_reporting:
+    iso_clause: "10.1.2"
+    control_name: "Reporting AI incidents"
+    control_description: "AI incidents shall be reported through appropriate channels"
+    evidence: "alert channels configuration"
+    implementation:
+      - "Multi-channel alerting (email, Slack, PagerDuty)"
+      - "Severity-based routing"
+      - "Automated compliance reporting"
+  
+  # AI-Specific Controls
+  model_governance:
+    iso_clause: "7.3.1"
+    control_name: "AI model management"
+    control_description: "AI models shall be managed throughout their lifecycle"
+    evidence: "model version tracking"
+    implementation:
+      - "Model version recorded per event"
+      - "Policy versioning and hot-reload"
+      - "Threshold management with audit trail"
+    
+  explainability:
+    iso_clause: "7.5.1"
+    control_name: "AI system transparency"
+    control_description: "AI decision-making shall be explainable"
+    evidence: "policy reason generation"
+    implementation:
+      - "Human-readable reasons for all decisions"
+      - "Risk score transparency"
+      - "Pattern matching explanations"
+  
+  # Performance Monitoring
+  performance_metrics:
+    iso_clause: "9.1.1"
+    control_name: "Monitoring and measurement"
+    control_description: "AI system performance shall be monitored"
+    evidence: "statistical evaluation"
+    implementation:
+      - "Precision/recall metrics by category"
+      - "Clustered standard error calculation"
+      - "Real-time performance dashboards"
+  
+  # Data Governance
+  data_quality:
+    iso_clause: "8.3.1"
+    control_name: "Data management"
+    control_description: "Data used by AI systems shall be managed for quality"
+    evidence: "synthetic data controls"
+    implementation:
+      - "Safe placeholder tokens for sensitive content"
+      - "Controlled risk pattern distribution"
+      - "Data quality metrics"
+
+# Compliance frameworks supported
+frameworks:
+  iso_42001:
+    full_name: "ISO/IEC 42001:2023"
+    description: "AI management system"
+    certification_possible: true
+    
+  nist_ai_rmf:
+    full_name: "NIST AI Risk Management Framework 1.0"
+    description: "Voluntary framework for AI risk management"
+    certification_possible: false
+    
+  eu_ai_act:
+    full_name: "EU Artificial Intelligence Act"
+    description: "Regulatory framework for AI in the European Union"
+    certification_possible: false 
