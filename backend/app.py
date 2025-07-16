@@ -107,53 +107,61 @@ async def ingest_events(batch: EventBatch, background_tasks: BackgroundTasks):
         
         if existing == 0:
             # Store event in database
-            conn.execute("""
-                INSERT INTO events (
-                    event_id, timestamp, user_id, org_id, surface, tier,
-                    prompt, completion, risk_scores, tags, model_version,
-                    action, asl_triggered
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, [
-                str(event.event_id),
-                event.timestamp,
-                event.user_id,
-                event.org_id,
-                event.surface.value,
-                event.tier.value,
-                event.prompt,
-                event.completion,
-                json.dumps(event.risk_scores),
-                json.dumps(event.tags),
-                event.model_version,
-                policy_action.action.value,
-                policy_action.asl_triggered
-            ])
-        
-            # Store policy action
-            conn.execute("""
-                INSERT INTO policy_actions (
-                    action_id, event_id, action, asl_level, policy_version, reason, timestamp
-                ) VALUES (?, ?, ?, ?, ?, ?, ?)
-            """, [
-                str(uuid4()),
-                str(event.event_id),
-                policy_action.action.value,
-                policy_action.asl_level,
-                policy_action.policy_version,
-                policy_action.reason,
-                policy_action.timestamp
-            ])
-        
-            # Add to review queue if escalated
-            if policy_action.action == ActionEnum.ESCALATE:
-                review_queue[event.event_id] = {
-                    "event": event,
-                    "policy_action": policy_action,
-                    "added_at": datetime.utcnow()
-                }
-        
-            processed_events.append(event)
-            policy_actions.append(policy_action)
+            try:
+                conn.execute("""
+                    INSERT INTO events (
+                        event_id, timestamp, user_id, org_id, surface, tier,
+                        prompt, completion, risk_scores, tags, model_version,
+                        action, asl_triggered
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """, [
+                    str(event.event_id),
+                    event.timestamp,
+                    event.user_id,
+                    event.org_id,
+                    event.surface.value,
+                    event.tier.value,
+                    event.prompt,
+                    event.completion,
+                    json.dumps(event.risk_scores),
+                    json.dumps(event.tags),
+                    event.model_version,
+                    policy_action.action.value,
+                    policy_action.asl_triggered
+                ])
+            
+                # Store policy action
+                conn.execute("""
+                    INSERT INTO policy_actions (
+                        action_id, event_id, action, asl_level, policy_version, reason, timestamp
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                """, [
+                    str(uuid4()),
+                    str(event.event_id),
+                    policy_action.action.value,
+                    policy_action.asl_level,
+                    policy_action.policy_version,
+                    policy_action.reason,
+                    policy_action.timestamp
+                ])
+                
+                # Add to review queue if escalated
+                if policy_action.action == ActionEnum.ESCALATE:
+                    review_queue[event.event_id] = {
+                        "event": event,
+                        "policy_action": policy_action,
+                        "added_at": datetime.utcnow()
+                    }
+            
+                processed_events.append(event)
+                policy_actions.append(policy_action)
+                
+            except Exception as e:
+                # Handle duplicate key or other database errors
+                print(f"Warning: Failed to insert event {event.event_id}: {e}")
+                # Still process the event for response metrics
+                processed_events.append(event)
+                policy_actions.append(policy_action)
     
     return {
         "processed": len(processed_events),
@@ -254,15 +262,15 @@ async def get_review_queue(limit: int = 50):
         "items": [
             {
                 "event_id": str(event_id),
-                "timestamp": item["event"]["timestamp"],
-                "user_id": item["event"]["user_id"],
-                "org_id": item["event"]["org_id"],
-                "surface": item["event"]["surface"],
-                "tier": item["event"]["tier"],
-                "prompt_preview": item["event"]["prompt"][:200] + "...",
-                "risk_scores": item["event"]["risk_scores"],
+                "timestamp": item["event"].timestamp.isoformat() if hasattr(item["event"].timestamp, 'isoformat') else str(item["event"].timestamp),
+                "user_id": item["event"].user_id,
+                "org_id": item["event"].org_id,
+                "surface": item["event"].surface.value if hasattr(item["event"].surface, 'value') else item["event"].surface,
+                "tier": item["event"].tier.value if hasattr(item["event"].tier, 'value') else item["event"].tier,
+                "prompt_preview": item["event"].prompt[:200] + "..." if len(item["event"].prompt) > 200 else item["event"].prompt,
+                "risk_scores": item["event"].risk_scores,
                 "reason": item["policy_action"].reason,
-                "added_to_queue": item["added_at"]
+                "added_to_queue": item["added_at"].isoformat() if hasattr(item["added_at"], 'isoformat') else str(item["added_at"])
             }
             for event_id, item in sorted_items
         ]

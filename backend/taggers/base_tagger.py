@@ -42,16 +42,28 @@ class RiskTagger(ABC):
         if not matches:
             return 0.0
         
-        # Sort by weight descending
-        matches.sort(key=lambda x: x[1], reverse=True)
+        # Separate positive and negative weights
+        positive_matches = [(p, w) for p, w in matches if w > 0]
+        negative_matches = [(p, w) for p, w in matches if w < 0]
         
-        # Weighted sum with decay
-        confidence = 0.0
-        decay = 1.0
+        # Calculate base confidence from positive matches
+        base_confidence = 0.0
+        if positive_matches:
+            # Sort by weight descending
+            positive_matches.sort(key=lambda x: x[1], reverse=True)
+            
+            decay = 1.0
+            for pattern, weight in positive_matches:
+                base_confidence += weight * decay
+                decay *= 0.8  # Each additional match contributes less
         
-        for pattern, weight in matches:
-            confidence += weight * decay
-            decay *= 0.8  # Each additional match contributes less
+        # Apply negative adjustments (context patterns)
+        negative_adjustment = 0.0
+        for pattern, weight in negative_matches:
+            negative_adjustment += abs(weight)  # Use absolute value for reduction
+        
+        # Final confidence with negative adjustments
+        final_confidence = base_confidence - negative_adjustment
         
         # Ensure confidence is between 0 and 1
-        return max(0.0, min(confidence, 1.0)) 
+        return max(0.0, min(final_confidence, 1.0)) 

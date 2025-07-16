@@ -1,4 +1,4 @@
-# claude governance control plane
+# claude governance control plane (cgcp)
 
 <div align="center">
 
