@@ -527,7 +527,7 @@ if page == "🎯 Operations Dashboard":
     # Executive Summary Cards
     st.markdown("## 📊 Executive Summary")
     
-        col1, col2, col3, col4, col5 = st.columns(5)
+    col1, col2, col3, col4, col5 = st.columns(5)
     
     total_events = metrics.get('total_events', 0)
     actions = metrics.get('actions_taken', {})
@@ -539,51 +539,51 @@ if page == "🎯 Operations Dashboard":
     block_rate = (blocked / max(total_events, 1)) * 100
     escalation_rate = (escalated / max(total_events, 1)) * 100
     compliance_rate = 100 - block_rate
-        
-        with col1:
-            st.metric(
+    
+    with col1:
+        st.metric(
             label="📈 Total Events",
             value=f"{total_events:,}",
             delta="+2.1K from yesterday",
             help="Total events processed through the governance system"
-            )
-        
-        with col2:
-            st.metric(
+        )
+    
+    with col2:
+        st.metric(
             label="🛡️ Block Rate",
             value=f"{block_rate:.1f}%",
             delta=f"-0.2%" if block_rate < 1 else f"+{block_rate-1:.1f}%",
             delta_color="inverse",
             help="Percentage of events blocked for safety violations"
-            )
-        
-        with col3:
-            st.metric(
+        )
+    
+    with col3:
+        st.metric(
             label="⚡ Escalations",
-                value=f"{escalated:,}",
+            value=f"{escalated:,}",
             delta="+3 new",
             help="Events requiring human review"
-            )
-        
-        with col4:
-            st.metric(
+        )
+    
+    with col4:
+        st.metric(
             label="🚨 ASL-3 Triggers",
             value=f"{asl_triggers:,}",
             delta="Critical" if asl_triggers > 0 else "All Clear",
             delta_color="off" if asl_triggers == 0 else "normal",
             help="Anthropic Safety Level 3 threshold violations"
-            )
-        
-        with col5:
-            st.metric(
+        )
+    
+    with col5:
+        st.metric(
             label="✅ Compliance",
-                value=f"{compliance_rate:.1f}%",
+            value=f"{compliance_rate:.1f}%",
             delta="+0.3%",
             help="Overall system compliance rate"
-            )
-        
-        st.markdown("---")
-        
+        )
+    
+    st.markdown("---")
+    
     # Risk Detection Overview
     st.markdown("## 🎯 Risk Detection Overview")
     
@@ -719,7 +719,7 @@ elif page == "🔍 Policy Review":
     
     col1, col2, col3, col4 = st.columns(4)
         
-        with col1:
+    with col1:
         st.metric("📥 Queue Size", review_queue.get('total', 0))
     with col2:
         st.metric("⏱️ Avg Wait Time", "2.3 hours")
@@ -919,7 +919,7 @@ elif page == "📊 Analytics":
     
     # Time range selector
     col1, col2 = st.columns([1, 3])
-                with col1:
+    with col1:
         time_range = st.selectbox(
             "📅 Analysis Period:",
             ["Last 24 Hours", "Last 7 Days", "Last 30 Days", "Custom Range"],
@@ -956,7 +956,7 @@ elif page == "📊 Analytics":
     with kpi_cols[5]:
         st.metric("🔄 Uptime", "99.99%", "0%")
                 
-                st.markdown("---")
+    st.markdown("---")
                 
     # Main Analytics Section
     tab1, tab2, tab3, tab4 = st.tabs([
@@ -970,8 +970,7 @@ elif page == "📊 Analytics":
         st.markdown("### 🎯 Risk Category Deep Dive")
         
         col1, col2 = st.columns(2)
-                
-                with col1:
+        with col1:
             # Risk distribution treemap
             risk_data = []
             total_risks = sum(risk_detections.values())
@@ -1005,7 +1004,7 @@ elif page == "📊 Analytics":
             else:
                 st.success("✅ **All Clear** - No significant risk detections")
                 
-                with col2:
+        with col2:
             # Action distribution
             if actions and sum(actions.values()) > 0:
                 fig = go.Figure(data=[
@@ -1128,9 +1127,8 @@ elif page == "📊 Analytics":
         tier_data = metrics.get('events_by_tier', {})
         
         if tier_data:
-                    col1, col2 = st.columns(2)
-            
-                    with col1:
+            col1, col2 = st.columns(2)
+            with col1:
                 # Tier distribution pie chart
                 fig = create_donut_chart(
                     tier_data,
@@ -1139,7 +1137,7 @@ elif page == "📊 Analytics":
                 )
                 st.plotly_chart(fig, use_container_width=True)
                     
-                    with col2:
+            with col2:
                 # Risk by tier analysis
                 tier_risk_data = {
                     'Tier': list(tier_data.keys()),
@@ -1240,8 +1238,7 @@ elif page == "📊 Analytics":
         
         # Pattern insights
         col1, col2 = st.columns(2)
-        
-    with col1:
+        with col1:
             st.markdown("#### 🎯 Detected Patterns")
             st.markdown("""
             - **Weekly Cycle**: Higher activity on weekdays
@@ -1250,7 +1247,7 @@ elif page == "📊 Analytics":
             - **Trend**: Overall stable with seasonal variation
             """)
     
-    with col2:
+        with col2:
             st.markdown("#### 🔧 Recommendations")
             st.markdown("""
             - **Scaling**: Consider auto-scaling during peak hours
@@ -1271,14 +1268,13 @@ elif page == "📜 Compliance":
     st.markdown("## 📋 Compliance Overview")
     
     col1, col2, col3, col4, col5 = st.columns(5)
-        
-        with col1:
+    with col1:
         st.metric("🏛️ ISO 42001", "✅ Compliant", "100%")
-        with col2:
+    with col2:
         st.metric("🇺🇸 NIST AI RMF", "✅ Compliant", "100%")
-        with col3:
+    with col3:
         st.metric("🇪🇺 EU AI Act", "⚠️ Monitoring", "95%")
-        with col4:
+    with col4:
         st.metric("📊 SOC 2", "🔄 In Progress", "80%")
     with col5:
         st.metric("🛡️ Last Audit", "✅ Passed", "2 days ago")
@@ -1289,7 +1285,6 @@ elif page == "📜 Compliance":
     st.markdown("## 🎯 Compliance Actions")
     
     col1, col2 = st.columns([2, 1])
-    
     with col1:
         if st.button("📥 Generate ISO 42001 Report", type="primary", use_container_width=True):
             with st.spinner("🔄 Generating comprehensive compliance report..."):
@@ -1407,7 +1402,7 @@ elif page == "📜 Compliance":
                         with download_cols[2]:
                             st.button("📧 Email Report", help="Send report to compliance team")
                     
-        else:
+                    else:
                         st.error(f"❌ **Report Generation Failed** - Status: {response.status_code}")
                         
                 except Exception as e:
@@ -1429,7 +1424,7 @@ elif page == "📜 Compliance":
                 st.toast(f"Executing: {button_text}", icon="🔄")
     
     # Compliance Trends
-st.markdown("---")
+    st.markdown("---")
     st.markdown("## 📈 Compliance Trends & Monitoring")
     
     # Generate compliance trend data
