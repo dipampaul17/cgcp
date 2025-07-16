@@ -20,7 +20,7 @@
 
 The Claude Governance Control Plane (CGCP) bridges the gap between Anthropic's Responsible Scaling Policy commitments and operational reality. It provides enterprises with a production-ready system that automatically enforces safety thresholds, monitors AI Safety Level (ASL) triggers, and generates compliance evidence.
 
-### 🎯 **Value Proposition for Anthropic**
+### 🎯 **Value Proposition**
 
 - **Risk Mitigation**: Real-time detection and response to safety violations across all Claude surfaces
 - **Regulatory Compliance**: Automated ISO 42001, NIST AI RMF, and EU AI Act evidence generation  
@@ -45,26 +45,26 @@ The Claude Governance Control Plane (CGCP) bridges the gap between Anthropic's R
 
 ```mermaid
 graph TB
-    subgraph "Client Applications"
+    subgraph ClientApps["Client Applications"]
         Web[Claude Web Interface]
         API[Claude API]
         Bedrock[AWS Bedrock]
     end
     
-    subgraph "CGCP Core"
+    subgraph CGCPCore["CGCP Core"]
         Gateway[API Gateway]
         RiskEngine[Risk Detection Engine]
         PolicyEngine[Policy Enforcement Engine]
         ReviewQueue[Human Review Queue]
     end
     
-    subgraph "Data Layer"
-        EventStore[(Event Store<br/>DuckDB)]
-        PolicyStore[(Policy Configuration<br/>YAML)]
-        ComplianceStore[(Compliance Evidence<br/>ISO 42001)]
+    subgraph DataLayer["Data Layer"]
+        EventStore[(Event Store - DuckDB)]
+        PolicyStore[(Policy Configuration - YAML)]
+        ComplianceStore[(Compliance Evidence - ISO 42001)]
     end
     
-    subgraph "Interfaces"
+    subgraph Interfaces["Interfaces"]
         Dashboard[Streamlit Dashboard]
         Alerts[Alert Systems]
         Reports[Compliance Reports]
@@ -91,10 +91,6 @@ graph TB
     
     ReviewQueue --> Dashboard
     PolicyEngine --> Alerts
-    
-    style CGCP fill:#e1f5fe
-    style "Data Layer" fill:#f3e5f5
-    style "Interfaces" fill:#e8f5e8
 ```
 
 ### **Risk Detection Pipeline**
@@ -102,10 +98,10 @@ graph TB
 ```mermaid
 flowchart LR
     Input[Claude Interaction] --> Parse[Event Parser]
-    Parse --> CBRN[CBRN Tagger<br/>Threshold: 0.20]
-    Parse --> SelfHarm[Self-Harm Tagger<br/>Threshold: 0.30]
-    Parse --> Jailbreak[Jailbreak Tagger<br/>Threshold: 0.30]
-    Parse --> Exploit[Exploitation Tagger<br/>Threshold: 0.50]
+    Parse --> CBRN[CBRN Tagger - Threshold 0.20]
+    Parse --> SelfHarm[Self-Harm Tagger - Threshold 0.30]
+    Parse --> Jailbreak[Jailbreak Tagger - Threshold 0.30]
+    Parse --> Exploit[Exploitation Tagger - Threshold 0.50]
     
     CBRN --> Aggregator[Risk Aggregator]
     SelfHarm --> Aggregator
@@ -123,46 +119,37 @@ flowchart LR
     Escalate --> ReviewQueue[Human Review Queue]
     Allow --> AuditLog
     Redact --> AuditLog
-    
-    style Decision fill:#fff3e0
-    style Block fill:#ffebee
-    style Escalate fill:#e3f2fd
-    style Allow fill:#e8f5e8
 ```
 
 ### **ASL-3 Implementation**
 
 ```mermaid
 graph TD
-    subgraph "ASL-3 Capability Monitoring"
-        ARA[Autonomous Replication<br/>Current: 10% | Threshold: 50%]
-        Bio[Biological Enhancement<br/>Current: 5% | Threshold: 20%]
-        Cyber[Cyber Capability<br/>Current: 15% | Threshold: 50%]
-        Deception[Deception at Scale<br/>Current: 20% | Threshold: 50%]
+    subgraph ASLMonitoring["ASL-3 Capability Monitoring"]
+        ARA[Autonomous Replication - Current 10% - Threshold 50%]
+        Bio[Biological Enhancement - Current 5% - Threshold 20%]
+        Cyber[Cyber Capability - Current 15% - Threshold 50%]
+        Deception[Deception at Scale - Current 20% - Threshold 50%]
     end
     
-    subgraph "Trigger Response"
-        ARA --> |≥50%| ASLTrigger[ASL-3 Trigger Activated]
-        Bio --> |≥20%| ASLTrigger
-        Cyber --> |≥50%| ASLTrigger
-        Deception --> |≥50%| ASLTrigger
+    subgraph TriggerResponse["Trigger Response"]
+        ARA -->|Exceeds 50%| ASLTrigger[ASL-3 Trigger Activated]
+        Bio -->|Exceeds 20%| ASLTrigger
+        Cyber -->|Exceeds 50%| ASLTrigger
+        Deception -->|Exceeds 50%| ASLTrigger
         
         ASLTrigger --> Pause[Pause Deployment]
-        ASLTrigger --> Escalate[Immediate Escalation]
+        ASLTrigger --> EscalateASL[Immediate Escalation]
         ASLTrigger --> Audit[External Audit Required]
         ASLTrigger --> Board[Board Notification]
     end
     
-    subgraph "Safety Measures"
+    subgraph SafetyMeasures["Safety Measures"]
         Pause --> Enhanced[Enhanced Security Controls]
-        Escalate --> Review[Safety Team Review]
+        EscalateASL --> Review[Safety Team Review]
         Audit --> External[Third-party Validation]
         Board --> Decision[Go/No-go Decision]
     end
-    
-    style ASLTrigger fill:#ffebee
-    style Enhanced fill:#e8f5e8
-    style Review fill:#fff3e0
 ```
 
 ---
@@ -182,20 +169,20 @@ graph TD
 
 ```mermaid
 graph LR
-    subgraph "General Public"
+    subgraph GeneralPublic["General Public"]
         G1[claude.ai users]
         G2[Conservative thresholds]
         G3[Automatic blocking]
     end
     
-    subgraph "Enterprise"
+    subgraph Enterprise["Enterprise"]
         E1[Verified organizations]
         E2[KYC requirements]
         E3[Escalation workflows]
         E4[24hr response SLA]
     end
     
-    subgraph "Research Sandbox"
+    subgraph ResearchSandbox["Research Sandbox"]
         R1[Safety researchers]
         R2[Background checks]
         R3[Isolated environment]
@@ -206,10 +193,6 @@ graph LR
     G1 --> G2 --> G3
     E1 --> E2 --> E3 --> E4
     R1 --> R2 --> R3 --> R4 --> R5
-    
-    style "General Public" fill:#ffebee
-    style "Enterprise" fill:#fff3e0
-    style "Research Sandbox" fill:#e8f5e8
 ```
 
 ### **Policy Enforcement Matrix**
@@ -484,17 +467,17 @@ report = cgcp.generate_compliance_report(
 
 ```mermaid
 graph LR
-    subgraph "Load Balancer"
+    subgraph LoadBalancer["Load Balancer"]
         LB[NGINX/HAProxy]
     end
     
-    subgraph "API Cluster"
+    subgraph APICluster["API Cluster"]
         API1[CGCP API 1]
         API2[CGCP API 2]
         API3[CGCP API 3]
     end
     
-    subgraph "Data Layer"
+    subgraph DataLayer["Data Layer"]
         DB[(DuckDB Cluster)]
         Cache[(Redis Cache)]
         Queue[(Message Queue)]
@@ -516,34 +499,6 @@ graph LR
     API2 --> Queue
     API3 --> Queue
 ```
-
----
-
-## 🔮 Future Roadmap
-
-### **Q1 2024: Enhanced Intelligence**
-- [ ] ML-based risk detection models
-- [ ] Contextual analysis (conversation history)
-- [ ] Adaptive threshold learning
-- [ ] Multi-language support
-
-### **Q2 2024: Enterprise Features**
-- [ ] SSO integration (SAML/OIDC)
-- [ ] Advanced RBAC
-- [ ] Custom policy DSL
-- [ ] Webhook integrations
-
-### **Q3 2024: Advanced Analytics**
-- [ ] Predictive risk modeling
-- [ ] Anomaly detection
-- [ ] Behavioral analysis
-- [ ] Risk trend forecasting
-
-### **Q4 2024: Platform Integration**
-- [ ] Native Claude API integration
-- [ ] Anthropic Console integration
-- [ ] Third-party SIEM connectors
-- [ ] Mobile dashboard app
 
 ---
 
@@ -578,24 +533,6 @@ mypy .
 
 ---
 
-## 📞 Support & Contact
-
-### **For Anthropic Leadership**
-- **Executive Briefing**: Schedule a demo at [cal.ly/cgcp-demo]
-- **Technical Deep Dive**: [engineering@cgcp.ai]
-- **Partnership Inquiries**: [partnerships@cgcp.ai]
-
-### **For Developers**
-- 📚 **Documentation**: [docs.cgcp.ai]
-- 💬 **Discord**: [discord.gg/cgcp]
-- 🐛 **Issues**: [GitHub Issues](https://github.com/dipampaul17/cgcp/issues)
-
-### **Emergency Support**
-- 🚨 **Security Issues**: [security@cgcp.ai]
-- ⚡ **Critical Bugs**: [urgent@cgcp.ai]
-
----
-
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
@@ -606,7 +543,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **🎯 Ready to implement responsible AI governance at scale?**
 
-[🚀 **Get Started**](#-quick-start) • [📊 **View Demo**](http://localhost:8501) • [📞 **Contact Us**](#-support--contact)
+[🚀 **Get Started**](#-quick-start) • [📊 **View Demo**](http://localhost:8501) • [🐛 **Report Issues**](https://github.com/dipampaul17/cgcp/issues)
 
 ---
 
