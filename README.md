@@ -1,6 +1,6 @@
-# claude governance control plane
-
 <div align="center">
+
+# claude governance control plane
 
 ![Status](https://img.shields.io/badge/status-production--ready-brightgreen?style=flat-square)
 ![Python](https://img.shields.io/badge/python-3.8+-blue?style=flat-square)
@@ -113,17 +113,6 @@ graph TB
     B --> C1 & C2
     C1 & C2 --> D
     D --> E1 & E2
-    
-    style A1 fill:#e1f5fe
-    style A2 fill:#e1f5fe
-    style A3 fill:#e1f5fe
-    style A4 fill:#e1f5fe
-    style B fill:#fff3e0
-    style C1 fill:#f3e5f5
-    style C2 fill:#f3e5f5
-    style D fill:#e8f5e9
-    style E1 fill:#fce4ec
-    style E2 fill:#fce4ec
 ```
 
 ### risk detection flow
@@ -162,13 +151,6 @@ flowchart LR
     S --> P1 & P2
     P1 --> A1 & A2 & A3
     P2 --> A4
-    
-    style E fill:#e3f2fd
-    style S fill:#f3e5f5
-    style A1 fill:#c8e6c9
-    style A2 fill:#ffcdd2
-    style A3 fill:#fff9c4
-    style A4 fill:#ffccbc
 ```
 
 ### policy enforcement tiers
@@ -204,13 +186,6 @@ graph TD
     Q --> TH1 --> O1
     Q --> TH2 --> O2
     Q --> TH3 --> O3
-    
-    style T1 fill:#ffebee
-    style T2 fill:#e8f5e9
-    style T3 fill:#e3f2fd
-    style O1 fill:#ffcdd2
-    style O2 fill:#fff9c4
-    style O3 fill:#c8e6c9
 ```
 
 ## 🚢 deployment
@@ -321,12 +296,6 @@ sequenceDiagram
     D->>A: compliance export
     A->>DB: aggregate evidence
     A-->>U: iso 42001 report
-    
-    style U fill:#e1f5fe
-    style D fill:#f3e5f5
-    style A fill:#fff3e0
-    style DB fill:#e8f5e9
-    style UI fill:#fce4ec
 ```
 
 ### synthetic data generation
