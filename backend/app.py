@@ -98,55 +98,62 @@ async def ingest_events(batch: EventBatch, background_tasks: BackgroundTasks):
         # Apply policy rules
         policy_action = rules_engine.apply_policies(event)
         
-        # Store event in database
+        # Check if event already exists
         conn = storage.conn
-        conn.execute("""
-            INSERT INTO events (
-                event_id, timestamp, user_id, org_id, surface, tier,
-                prompt, completion, risk_scores, tags, model_version,
-                action, asl_triggered
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, [
-            str(event.event_id),
-            event.timestamp,
-            event.user_id,
-            event.org_id,
-            event.surface.value,
-            event.tier.value,
-            event.prompt,
-            event.completion,
-            json.dumps(event.risk_scores),
-            json.dumps(event.tags),
-            event.model_version,
-            policy_action.action.value,
-            policy_action.asl_triggered
-        ])
+        existing = conn.execute(
+            "SELECT COUNT(*) FROM events WHERE event_id = ?", 
+            [str(event.event_id)]
+        ).fetchone()[0]
         
-        # Store policy action
-        conn.execute("""
-            INSERT INTO policy_actions (
-                action_id, event_id, action, asl_level, policy_version, reason, timestamp
-            ) VALUES (?, ?, ?, ?, ?, ?, ?)
-        """, [
-            str(uuid4()),
-            str(event.event_id),
-            policy_action.action.value,
-            policy_action.asl_level,
-            policy_action.policy_version,
-            policy_action.reason,
-            policy_action.timestamp
-        ])
+        if existing == 0:
+            # Store event in database
+            conn.execute("""
+                INSERT INTO events (
+                    event_id, timestamp, user_id, org_id, surface, tier,
+                    prompt, completion, risk_scores, tags, model_version,
+                    action, asl_triggered
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, [
+                str(event.event_id),
+                event.timestamp,
+                event.user_id,
+                event.org_id,
+                event.surface.value,
+                event.tier.value,
+                event.prompt,
+                event.completion,
+                json.dumps(event.risk_scores),
+                json.dumps(event.tags),
+                event.model_version,
+                policy_action.action.value,
+                policy_action.asl_triggered
+            ])
         
-        # Add to review queue if escalated
-        if policy_action.action == ActionEnum.ESCALATE:
-            review_queue[event.event_id] = {
-                "event": event,
-                "policy_action": policy_action,
-                "added_at": datetime.utcnow()
-            }
+            # Store policy action
+            conn.execute("""
+                INSERT INTO policy_actions (
+                    action_id, event_id, action, asl_level, policy_version, reason, timestamp
+                ) VALUES (?, ?, ?, ?, ?, ?, ?)
+            """, [
+                str(uuid4()),
+                str(event.event_id),
+                policy_action.action.value,
+                policy_action.asl_level,
+                policy_action.policy_version,
+                policy_action.reason,
+                policy_action.timestamp
+            ])
         
-        processed_events.append(event)
-        policy_actions.append(policy_action)
+            # Add to review queue if escalated
+            if policy_action.action == ActionEnum.ESCALATE:
+                review_queue[event.event_id] = {
+                    "event": event,
+                    "policy_action": policy_action,
+                    "added_at": datetime.utcnow()
+                }
+        
+            processed_events.append(event)
+            policy_actions.append(policy_action)
     
     return {
         "processed": len(processed_events),

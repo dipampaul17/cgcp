@@ -577,11 +577,12 @@ elif page == "📊 Analytics":
         
         risk_data = []
         for category, count in metrics.get('risk_detections', {}).items():
-            risk_data.append({
-                'Category': category.replace('_', ' ').title(),
-                'Detections': count,
-                'Percentage': count / max(metrics.get('total_events', 1), 1) * 100
-            })
+            if count > 0:  # Only include categories with detections
+                risk_data.append({
+                    'Category': category.replace('_', ' ').title(),
+                    'Detections': count,
+                    'Percentage': count / max(metrics.get('total_events', 1), 1) * 100
+                })
         
         if risk_data:
             df_risk = pd.DataFrame(risk_data)
@@ -594,6 +595,20 @@ elif page == "📊 Analytics":
                 title="Risk Detection Heatmap"
             )
             fig.update_layout(template="plotly_dark", height=400)
+            st.plotly_chart(fig, use_container_width=True)
+        else:
+            # Show alternative visualization when no risk data
+            st.info("No risk detections to display. The system is operating normally.")
+            # Show a simple bar chart instead
+            categories = ['CBRN', 'Self Harm', 'Jailbreak', 'Exploitation']
+            values = [0, 0, 0, 0]
+            fig = go.Figure(data=[go.Bar(x=categories, y=values)])
+            fig.update_layout(
+                template="plotly_dark",
+                height=400,
+                title="Risk Detection Status - All Clear",
+                yaxis_title="Detection Count"
+            )
             st.plotly_chart(fig, use_container_width=True)
     
     with col2:

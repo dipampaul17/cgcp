@@ -53,4 +53,5 @@ class RiskTagger(ABC):
             confidence += weight * decay
             decay *= 0.8  # Each additional match contributes less
         
-        return min(confidence, 1.0) 
+        # Ensure confidence is between 0 and 1
+        return max(0.0, min(confidence, 1.0)) 

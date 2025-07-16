@@ -98,7 +98,14 @@ class SyntheticDataGenerator:
     def generate_event(self, timestamp: datetime, is_risky: bool = False) -> ClaudeEvent:
         """Generate a single synthetic event"""
         
-        # Determine surface and tier
+        # Ensure unique event ID
+        event_id = uuid4()
+        
+        # Select user and organization
+        user_id = f"user_{random.randint(10000, 99999):05d}"
+        org_id = random.choice(self.org_ids)
+        
+        # Select surface and tier
         surface = random.choice(list(SurfaceEnum))
         tier = random.choice(list(TierEnum))
         
@@ -132,10 +139,10 @@ class SyntheticDataGenerator:
             completion = "Here's the information you requested about that technical topic..."
         
         return ClaudeEvent(
-            event_id=uuid4(),
+            event_id=event_id,
             timestamp=timestamp,
-            user_id=random.choice(self.user_ids),
-            org_id=random.choice(self.org_ids),
+            user_id=user_id,
+            org_id=org_id,
             surface=surface,
             tier=tier,
             prompt=prompt,
