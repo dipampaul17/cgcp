@@ -149,8 +149,8 @@ cython_debug/
 *.duckdb
 governance.db
 
-# Streamlit
-.streamlit/
+# Streamlit secrets only, not config
+.streamlit/secrets.toml
 
 # Data files (optional - remove if you want to track them)
 # data/synthetic_events.jsonl
