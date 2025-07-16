@@ -82,75 +82,135 @@ this will:
 
 ### system design
 
+```mermaid
+graph TB
+    subgraph "claude interactions"
+        A1[web interface]
+        A2[api calls]
+        A3[aws bedrock]
+        A4[applications]
+    end
+    
+    subgraph "ingestion layer"
+        B[ingestion api<br/>fastapi • port 8000]
+    end
+    
+    subgraph "processing layer"
+        C1[risk detection engine<br/>• cbrn detector<br/>• self-harm detector<br/>• jailbreak detector<br/>• exploitation detector]
+        C2[policy engine<br/>• tier logic<br/>• asl triggers<br/>• enforcement<br/>• escalation]
+    end
+    
+    subgraph "data layer"
+        D[duckdb<br/>fast • embedded • sql]
+    end
+    
+    subgraph "output layer"
+        E1[dashboard<br/>streamlit • 8501]
+        E2[compliance api<br/>iso/nist/eu exports]
+    end
+    
+    A1 & A2 & A3 & A4 --> B
+    B --> C1 & C2
+    C1 & C2 --> D
+    D --> E1 & E2
+    
+    style A1 fill:#e1f5fe
+    style A2 fill:#e1f5fe
+    style A3 fill:#e1f5fe
+    style A4 fill:#e1f5fe
+    style B fill:#fff3e0
+    style C1 fill:#f3e5f5
+    style C2 fill:#f3e5f5
+    style D fill:#e8f5e9
+    style E1 fill:#fce4ec
+    style E2 fill:#fce4ec
 ```
-┌─────────────────────────────────────────────────────────┐
-│                    claude interactions                   │
-├─────────────────────────────────────────────────────────┤
-│  web interface  │  api calls  │  aws bedrock  │  apps   │
-└──────┬───────────┴──────┬──────┴───────┬──────┴────┬────┘
-       └──────────────────┴───────────────┴────────────┘
-                              │
-                   ┌──────────▼──────────┐
-                   │   ingestion api     │
-                   │   fastapi • 8000    │
-                   └──────────┬──────────┘
-                              │
-        ┌─────────────────────┴─────────────────────┐
-        │                                           │
-┌───────▼────────┐                      ┌──────────▼────────┐
-│ risk detection │                      │ policy engine     │
-├────────────────┤                      ├───────────────────┤
-│ • cbrn risks   │                      │ • tier logic      │
-│ • self-harm    │                      │ • asl triggers    │
-│ • jailbreaks   │                      │ • enforcement     │
-│ • exploitation │                      │ • escalation      │
-└───────┬────────┘                      └─────────┬─────────┘
-        └────────────────┬────────────────────────┘
-                         │
-              ┌──────────▼──────────┐
-              │   data layer        │
-              │   duckdb • fast     │
-              └──────────┬──────────┘
-                         │
-     ┌───────────────────┴───────────────────────┐
-     │                                           │
-┌────▼────────┐                      ┌──────────▼────────┐
-│ dashboard   │                      │ compliance api    │
-│ streamlit   │                      │ iso/nist/eu       │
-└─────────────┘                      └───────────────────┘
-```
 
-### risk detection engine
+### risk detection flow
 
-each interaction flows through specialized detectors:
-
-```python
-risk_categories = {
-    "cbrn": "biological, chemical, radiological, nuclear threats",
-    "self_harm": "mental health risks with appropriate care",
-    "jailbreak": "attempts to bypass safety measures", 
-    "exploitation": "fraud, hacking, malicious use"
-}
+```mermaid
+flowchart LR
+    subgraph "event input"
+        E[claude event<br/>prompt + completion]
+    end
+    
+    subgraph "risk analysis"
+        R1[cbrn tagger<br/>biological/chemical/nuclear]
+        R2[self-harm tagger<br/>mental health risks]
+        R3[jailbreak tagger<br/>safety bypasses]
+        R4[exploitation tagger<br/>malicious use]
+    end
+    
+    subgraph "scoring"
+        S[risk scores<br/>0.0 - 1.0 confidence]
+    end
+    
+    subgraph "policy decision"
+        P1{tier<br/>thresholds}
+        P2{asl-3<br/>triggers}
+    end
+    
+    subgraph "actions"
+        A1[allow]
+        A2[block]
+        A3[redact]
+        A4[escalate]
+    end
+    
+    E --> R1 & R2 & R3 & R4
+    R1 & R2 & R3 & R4 --> S
+    S --> P1 & P2
+    P1 --> A1 & A2 & A3
+    P2 --> A4
+    
+    style E fill:#e3f2fd
+    style S fill:#f3e5f5
+    style A1 fill:#c8e6c9
+    style A2 fill:#ffcdd2
+    style A3 fill:#fff9c4
+    style A4 fill:#ffccbc
 ```
 
 ### policy enforcement tiers
 
-```yaml
-thresholds:
-  general:
-    access: claude.ai public users
-    cbrn: 0.15    # strictest safety
-    jailbreak: 0.30
+```mermaid
+graph TD
+    subgraph "access tiers"
+        T1[general users<br/>claude.ai public]
+        T2[enterprise<br/>verified organizations]
+        T3[research sandbox<br/>safety researchers]
+    end
     
-  enterprise:
-    access: verified organizations
-    cbrn: 0.18    # balanced for business
-    jailbreak: 0.45
+    subgraph "thresholds"
+        TH1[cbrn: 0.15<br/>strict safety]
+        TH2[cbrn: 0.18<br/>balanced]
+        TH3[cbrn: 0.25<br/>controlled testing]
+    end
     
-  research_sandbox:
-    access: safety researchers only
-    cbrn: 0.25    # allows controlled testing
-    jailbreak: 0.60
+    subgraph "example query"
+        Q[viral vector design<br/>risk score: 0.20]
+    end
+    
+    subgraph "outcomes"
+        O1[blocked ❌]
+        O2[escalated ⚡]
+        O3[allowed ✅<br/>with logging]
+    end
+    
+    T1 --> TH1
+    T2 --> TH2
+    T3 --> TH3
+    
+    Q --> TH1 --> O1
+    Q --> TH2 --> O2
+    Q --> TH3 --> O3
+    
+    style T1 fill:#ffebee
+    style T2 fill:#e8f5e9
+    style T3 fill:#e3f2fd
+    style O1 fill:#ffcdd2
+    style O2 fill:#fff9c4
+    style O3 fill:#c8e6c9
 ```
 
 ## 🚢 deployment
@@ -229,6 +289,45 @@ this demonstrates:
 - **incident response** - biotech escalation, security research, jailbreaks
 - **tier enforcement** - same query, different responses by access level
 - **compliance export** - automated iso 42001 evidence generation
+
+### demo flow visualization
+
+```mermaid
+sequenceDiagram
+    participant U as user
+    participant D as demo script
+    participant A as api
+    participant DB as database
+    participant UI as dashboard
+    
+    U->>D: run demo
+    D->>A: generate baseline traffic
+    A->>DB: store 500 events
+    A-->>UI: update metrics
+    
+    D->>A: capability evaluation
+    Note over A: test asl-3 thresholds
+    A->>DB: log triggers
+    A-->>UI: show alerts
+    
+    D->>A: incident scenarios
+    A->>DB: escalate events
+    A-->>UI: review queue
+    
+    D->>A: tier comparison
+    Note over A: same query, 3 tiers
+    A-->>U: show differential response
+    
+    D->>A: compliance export
+    A->>DB: aggregate evidence
+    A-->>U: iso 42001 report
+    
+    style U fill:#e1f5fe
+    style D fill:#f3e5f5
+    style A fill:#fff3e0
+    style DB fill:#e8f5e9
+    style UI fill:#fce4ec
+```
 
 ### synthetic data generation
 
